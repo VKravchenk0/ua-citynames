@@ -67,6 +67,19 @@ def process_case(name):
 def add_settlement_type_prefix(row):
     return settlement_types_dict[row['category']] + row['display_name']
 
+def write_result_to_file():
+    longest_string_length = df.display_name.str.len().max()
+    number_of_dots = longest_string_length + 10
+    with open(get_output_file_name(), 'w') as fp:
+        count_label = "Кількість"
+        count_label_length = len(count_label)
+        fp.write(f'{"Назва":.<{number_of_dots - count_label_length}}{count_label}\n')
+        for idx, name in enumerate(item_counts.index.tolist()):
+            count = item_counts[idx]
+            # for formatting purposes
+            number_of_digits_in_count = len(str(count))
+            fp.write(f'{name:.<{number_of_dots - number_of_digits_in_count}}{count}\n')
+
 
 reset_output_directory()
 
@@ -86,7 +99,7 @@ df = df[['name', 'category']]
 
 print_df("START")
 
-# deleting categories
+# deleting categories. Р - districts of large cities
 df = df[~df.category.isin(['', 'Р'])]
 
 print_df("CATEGORIES DELETED")
@@ -115,14 +128,4 @@ item_counts = df["display_name"].value_counts()[df['display_name'].unique()]
 # item_counts = df["display_name"].value_counts() # - сортування за кількістю населених пунктів з назвою
 print(item_counts)
 
-longest_string_length = df.display_name.str.len().max()
-number_of_dots = longest_string_length + 10
-with open(get_output_file_name(), 'w') as fp:
-    count_label = "Кількість"
-    count_label_length = len(count_label)
-    fp.write(f'{"Назва":.<{number_of_dots - count_label_length}}{count_label}\n')
-    for idx, name in enumerate(item_counts.index.tolist()):
-        count = item_counts[idx]
-        # for formatting purposes
-        number_of_digits_in_count = len(str(count))
-        fp.write(f'{name:.<{number_of_dots - number_of_digits_in_count}}{count}\n')
+write_result_to_file()
