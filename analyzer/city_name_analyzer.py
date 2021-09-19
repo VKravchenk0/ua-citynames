@@ -42,7 +42,9 @@ class CityNameAnalyzer:
     def write_result_to_file(self, df, item_counts):
         longest_string_length = df.display_name.str.len().max()
         number_of_dots = longest_string_length + 10
-        with open(FileUtils().get_output_file_name(), 'w') as fp:
+        result_file_name = "result"
+        FileUtils().create_output_dir(result_file_name)
+        with open(FileUtils().get_output_file_path(result_file_name), 'w') as fp:
             count_label = "Кількість"
             count_label_length = len(count_label)
             fp.write(f'{"Назва":.<{number_of_dots - count_label_length}}{count_label}\n')
