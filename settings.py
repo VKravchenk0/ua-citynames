@@ -1,4 +1,4 @@
-dev = True
-# dev = False
+# dev = True
+dev = False
 
 base_output_dir = './output'
