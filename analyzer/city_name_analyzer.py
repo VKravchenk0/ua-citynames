@@ -39,12 +39,12 @@ class CityNameAnalyzer:
     def add_settlement_type_prefix(self, row):
         return self.settlement_types_dict[row['category']] + row['display_name']
 
-    def write_result_to_file(self, df, item_counts):
+    def write_result_to_file(self, df, item_counts, result_file_name, label):
         longest_string_length = df.display_name.str.len().max()
         number_of_dots = longest_string_length + 10
-        result_file_name = "result"
         FileUtils().create_output_dir(result_file_name)
         with open(FileUtils().get_output_file_path(result_file_name), 'w') as fp:
+            fp.write(label + '\n')
             count_label = "Кількість"
             count_label_length = len(count_label)
             fp.write(f'{"Назва":.<{number_of_dots - count_label_length}}{count_label}\n')
@@ -58,6 +58,11 @@ class CityNameAnalyzer:
 
         df = pd.read_json(input_file_location)
 
+        df = self.prepare_dataset(df)
+
+        self.sort_and_write_dataset_to_file(df)
+
+    def prepare_dataset(self, df):
         # renaming columns
         df.rename(columns={'Назва об\'єкта українською мовою': 'name', 'Категорія': 'category'}, inplace=True)
         # deleting unused columns
@@ -85,11 +90,12 @@ class CityNameAnalyzer:
         df['display_name'] = df.apply(lambda row: self.add_settlement_type_prefix(row), axis=1)
 
         self.print_df("WITH SETTLEMENT TYPE", df)
+        return df
 
+    def sort_and_write_dataset_to_file(self, df):
         df = df.sort_values('name')
         # [df['display_name'].unique()] - магічне сортування за алфавітом
         item_counts = df["display_name"].value_counts()[df['display_name'].unique()]
         # item_counts = df["display_name"].value_counts() # - сортування за кількістю населених пунктів з назвою
         print(item_counts)
-
-        self.write_result_to_file(df, item_counts)
+        self.write_result_to_file(df, item_counts, result_file_name="result", label="ВСЯ УКРАЇНА")
