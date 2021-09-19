@@ -7,13 +7,12 @@ import settings
 class FileUtils:
 
     @staticmethod
-    def get_output_file_name():
-        filename = 'result_dev.txt' if settings.dev else 'result.txt'
-        return f"{settings.base_output_dir}/{filename}"
+    def get_output_file_path(filename):
+        filename_with_extension = filename + ('_dev.txt' if settings.dev else '.txt')
+        return f"{settings.base_output_dir}/{filename_with_extension}"
 
     def reset_output_directory(self):
         self.delete_output_dir_if_exists()
-        self.create_output_dir()
 
     @staticmethod
     def delete_output_dir_if_exists():
@@ -21,8 +20,8 @@ class FileUtils:
         if dirpath.exists() and dirpath.is_dir():
             shutil.rmtree(dirpath)
 
-    def create_output_dir(self):
-        filename = self.get_output_file_name()
+    def create_output_dir(self, filename):
+        filename = self.get_output_file_path(filename)
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
     @staticmethod
